@@ -91,7 +91,6 @@ class AddonController extends Controller
                         $addon->version = $json['version'];
                         $addon->activated = 1;
                         $addon->image = $json['addon_banner'];
-                        $addon->purchase_code = $request->purchase_code;
                         $addon->save();
 
                         // Create new directories.
@@ -158,7 +157,6 @@ class AddonController extends Controller
                         }
 
                         $addon->version = $json['version'];
-                        $addon->purchase_code = $request->purchase_code;
                         $addon->save();
 
                         flash(translate('This addon is updated successfully'))->success();
