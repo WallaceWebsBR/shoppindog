@@ -37,6 +37,9 @@ class CheckoutController extends Controller
             (new OrderController)->store($request);
 
             $request->session()->put('payment_type', 'cart_payment');
+            
+            $data['combined_order_id'] = $request->session()->get('combined_order_id');
+            $request->session()->put('payment_data', $data);
 
             if ($request->session()->get('combined_order_id') != null) {
                 if ($request->payment_option == 'paypal') {
@@ -54,9 +57,8 @@ class CheckoutController extends Controller
                 } elseif ($request->payment_option == 'razorpay') {
                     $razorpay = new RazorpayController;
                     return $razorpay->payWithRazorpay($request);
-                } elseif ($request->payment_option == 'proxypay') {
-                    //$proxy = new ProxypayController;
-                    //return $proxy->create_reference($request);
+                } elseif ($request->payment_option == 'payku') {
+                    return (new PaykuController)->create($request);
                 } elseif ($request->payment_option == 'voguepay') {
                     $voguePay = new VoguePayController;
                     return $voguePay->customer_showForm();

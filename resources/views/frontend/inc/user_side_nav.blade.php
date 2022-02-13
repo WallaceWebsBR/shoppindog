@@ -162,6 +162,14 @@
                                 <span class="aiz-side-nav-text">{{ translate('Digital Products') }}</span>
                             </a>
                         </li>
+                        @if(addon_is_activated('wholesale') && get_setting('seller_wholesale_product') == 1)
+                            <li class="aiz-side-nav-item">
+                                <a href="{{ route('seller.wholesale_products_list') }}" class="aiz-side-nav-link {{ areActiveRoutes(['wholesale_product_create.seller','wholesale_product_edit.seller'])}}">
+                                    <i class="las la-luggage-cart aiz-side-nav-icon"></i>
+                                    <span class="aiz-side-nav-text">{{ translate('Wholesale Products') }}</span>
+                                </a>
+                            </li>
+                        @endif
                         <li class="aiz-side-nav-item">
                             <a href="{{ route('my_uploads.all') }}" class="aiz-side-nav-link {{ areActiveRoutes(['my_uploads.new'])}}">
                                 <i class="las la-folder-open aiz-side-nav-icon"></i>
@@ -193,9 +201,9 @@
                                 <span class="aiz-side-nav-arrow"></span>
                             </a>
                             <ul class="aiz-side-nav-list level-2">
-                                @if (Auth::user()->user_type == 'seller')
+                                @if (Auth::user()->user_type == 'seller' && get_setting('seller_auction_product') == 1)
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{ route('auction_products.seller.index') }}" class="aiz-side-nav-link {{ areActiveRoutes(['auction_products.seller.index','auction_products.create','auction_products.edit'])}}">
+                                        <a href="{{ route('auction_products.seller.index') }}" class="aiz-side-nav-link {{ areActiveRoutes(['auction_products.seller.index','auction_product_create.seller','auction_product_edit.seller','product_bids.seller'])}}">
                                             <span class="aiz-side-nav-text">{{ translate('All Auction Products') }}</span>
                                         </a>
                                     </li>

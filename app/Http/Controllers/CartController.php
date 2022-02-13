@@ -321,6 +321,7 @@ class CartController extends Controller
                 }
             }
 
+            $cartItem['price'] = $price;
             $cartItem->save();
         }
 

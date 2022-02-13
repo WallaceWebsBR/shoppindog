@@ -245,23 +245,23 @@
                     @if ($product->digital == 1)
                         <button type="button" class="btn btn-primary buy-now fw-600 add-to-cart" onclick="addToCart()">
                             <i class="la la-shopping-cart"></i>
-                            <span class="d-none d-md-inline-block"> {{ translate('Add to cart')}}</span>
+                            <span class="d-none d-md-inline-block">{{ translate('Add to cart')}}</span>
                         </button>
                     @elseif($qty > 0)
                         @if ($product->external_link != null)
                             <a type="button" class="btn btn-soft-primary mr-2 add-to-cart fw-600" href="{{ $product->external_link }}">
-                                <i class="las la-shopping-bag"></i>
-                                <span class="d-none d-md-inline-block"> {{ translate('Add to cart')}}</span>
+                                <i class="las la-share"></i>
+                                <span class="d-none d-md-inline-block">{{ translate($product->external_link_btn)}}</span>
                             </a>
                         @else
                             <button type="button" class="btn btn-primary buy-now fw-600 add-to-cart" onclick="addToCart()">
                                 <i class="la la-shopping-cart"></i>
-                                <span class="d-none d-md-inline-block"> {{ translate('Add to cart')}}</span>
+                                <span class="d-none d-md-inline-block">{{ translate('Add to cart')}}</span>
                             </button>
                         @endif
                     @endif
                     <button type="button" class="btn btn-secondary out-of-stock fw-600 d-none" disabled>
-                        <i class="la la-cart-arrow-down"></i> {{ translate('Out of Stock')}}
+                        <i class="la la-cart-arrow-down"></i>{{ translate('Out of Stock')}}
                     </button>
                 </div>
 

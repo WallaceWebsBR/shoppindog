@@ -41,6 +41,7 @@
                                 <th data-breakpoints="lg">#</th>
                                 <th>{{translate('Name')}}</th>
                                 <th>{{translate('State')}}</th>
+                                <th>{{translate('Area Wise Shipping Cost')}}</th>
                                 <th>{{translate('Show/Hide')}}</th>
                                 <th data-breakpoints="lg" class="text-right">{{translate('Options')}}</th>
                             </tr>
@@ -51,6 +52,7 @@
                                     <td>{{ ($key+1) + ($cities->currentPage() - 1)*$cities->perPage() }}</td>
                                     <td>{{ $city->name }}</td>
                                     <td>{{ $city->state->name }}</td>
+                                    <td>{{ single_price($city->cost) }}</td>
                                     <td>
                                         <label class="aiz-switch aiz-switch-success mb-0">
                                           <input onchange="update_status(this)" value="{{ $city->id }}" type="checkbox" <?php if($city->status == 1) echo "checked";?> >

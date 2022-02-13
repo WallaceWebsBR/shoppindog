@@ -91,10 +91,8 @@
                                 data-role="tagsinput">
                         </div>
                     </div>
-                    @php
-                    $pos_addon = \App\Models\Addon::where('unique_identifier', 'pos_system')->first();
-                    @endphp
-                    @if ($pos_addon != null && $pos_addon->activated == 1)
+                    
+                    @if (addon_is_activated('pos_system'))
                     <div class="form-group row">
                         <label class="col-lg-3 col-from-label">{{translate('Barcode')}}</label>
                         <div class="col-lg-8">
@@ -104,10 +102,7 @@
                     </div>
                     @endif
 
-                    @php
-                    $refund_request_addon = \App\Models\Addon::where('unique_identifier', 'refund_request')->first();
-                    @endphp
-                    @if ($refund_request_addon != null && $refund_request_addon->activated == 1)
+                    @if (addon_is_activated('refund_request'))
                     <div class="form-group row">
                         <label class="col-lg-3 col-from-label">{{translate('Refundable')}}</label>
                         <div class="col-lg-8">
@@ -318,14 +313,18 @@
             </div>
 
             @php
-                $start_date = date('d-m-Y H:i:s', $product->discount_start_date);
-                $end_date = date('d-m-Y H:i:s', $product->discount_end_date);
+                $date_range = '';
+                if($product->discount_start_date){
+                    $start_date = date('d-m-Y H:i:s', $product->discount_start_date);
+                    $end_date = date('d-m-Y H:i:s', $product->discount_end_date);
+                    $date_range = $start_date.' to '.$end_date;
+                }
             @endphp
 
             <div class="form-group row">
                 <label class="col-lg-3 col-from-label" for="start_date">{{translate('Discount Date Range')}}</label>
                 <div class="col-lg-9">
-                    <input type="text" class="form-control aiz-date-range" value="{{ $start_date.' to '.$end_date }}" name="date_range" placeholder="{{translate('Select Date')}}" data-time-picker="true" data-format="DD-MM-Y HH:mm:ss" data-separator=" to " autocomplete="off">
+                    <input type="text" class="form-control aiz-date-range" value="{{ $date_range }}" name="date_range" placeholder="{{translate('Select Date')}}" data-time-picker="true" data-format="DD-MM-Y HH:mm:ss" data-separator=" to " autocomplete="off">
                 </div>
             </div>
 
@@ -350,7 +349,7 @@
                     <label class="col-lg-3 col-from-label">{{translate('Quantity')}}</label>
                     <div class="col-lg-6">
                         <input type="number" lang="en" value="{{ $product->stocks->first()->qty }}" step="1"
-                            placeholder="{{translate('Quantity')}}" name="current_stock" class="form-control" required>
+                            placeholder="{{translate('Quantity')}}" name="current_stock" class="form-control">
                     </div>
                 </div>
                 <div class="form-group row">
@@ -368,6 +367,15 @@
                 </label>
                 <div class="col-md-9">
                     <input type="text" placeholder="{{ translate('External link') }}" name="external_link" value="{{ $product->external_link }}" class="form-control">
+                    <small class="text-muted">{{translate('Leave it blank if you do not use external site link')}}</small>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-md-3 col-from-label">
+                    {{translate('External link button text')}}
+                </label>
+                <div class="col-md-9">
+                    <input type="text" placeholder="{{ translate('External link button text') }}" name="external_link_btn" value="{{ $product->external_link_btn }}" class="form-control">
                     <small class="text-muted">{{translate('Leave it blank if you do not use external site link')}}</small>
                 </div>
             </div>

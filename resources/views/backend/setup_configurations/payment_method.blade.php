@@ -566,73 +566,6 @@
             </div>
         </div>
 
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0 h6">{{translate('ProxyPay Credential')}}</h5>
-                </div>
-                <div class="card-body">
-                    <form class="form-horizontal" action="{{ route('payment_method.update') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="payment_method" value="proxypay">
-                        <div class="form-group row">
-                            <input type="hidden" name="types[]" value="PROXYPAY_TOKEN">
-                            <div class="col-lg-4">
-                                <label class="col-from-label">{{translate('PROXYPAY_TOKEN')}}</label>
-                            </div>
-                            <div class="col-lg-8">
-                                <input type="text" class="form-control" name="PROXYPAY_TOKEN" value="{{  env('PROXYPAY_TOKEN') }}" placeholder="{{ translate('PROXYPAY TOKEN') }}" required>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <input type="hidden" name="types[]" value="PROXYPAY_ENTITY">
-                            <div class="col-lg-4">
-                                <label class="col-from-label">{{translate('PROXYPAY_ENTITY')}}</label>
-                            </div>
-                            <div class="col-lg-8">
-                                <input type="text" class="form-control" name="PROXYPAY_ENTITY" value="{{  env('PROXYPAY_ENTITY') }}" placeholder="{{ translate('PROXYPAY_ENTITY') }}" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <input type="hidden" name="types[]" value="PROXYPAY_END_TIME">
-                            <div class="col-lg-4">
-                                <label class="col-from-label">{{translate('PROXYPAY_END_TIME')}}</label>
-                            </div>
-                            <div class="col-lg-8">
-                                <div class="input-group">
-                                    <input type="text" class="form-control" name="PROXYPAY_END_TIME" value="{{  env('PROXYPAY_END_TIME') }}" placeholder="{{ translate('PROXYPAY_END_TIME') }}" required>
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" id="inputGroupPrepend">
-                                            {{translate('Days')}}
-                                        </span>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-md-4">
-                                <label class="col-from-label">{{translate('Sandbox Mode')}}</label>
-                            </div>
-                            <div class="col-md-8">
-
-                                <label class="aiz-switch aiz-switch-success mb-0">
-                                    <input value="1" name="proxypay_sandbox" type="checkbox" @if (get_setting('proxypay_sandbox') == 1) checked @endif>
-                                    <span class="slider round"></span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="form-group mb-0 text-right">
-                            <button type="submit" class="btn btn-sm btn-primary">{{translate('Save')}}</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
@@ -746,6 +679,51 @@
                                     @endif>
                                     <span class="slider round"></span>
                                 </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-0 text-right">
+                            <button type="submit" class="btn btn-sm btn-primary">{{translate('Save')}}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0 h6">{{translate('Payku')}}</h5>
+                </div>
+                <div class="card-body">
+                    <form class="form-horizontal" action="{{ route('payment_method.update') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="payment_method" value="payku">
+                        <div class="form-group row">
+                            <input type="hidden" name="types[]" value="PAYKU_BASE_URL">
+                            <div class="col-lg-4">
+                                <label class="col-from-label">{{translate('PAYKU_BASE_URL')}}</label>
+                            </div>
+                            <div class="col-lg-8">
+                                <input type="text" class="form-control" name="PAYKU_BASE_URL" value="{{  env('PAYKU_BASE_URL') }}" placeholder="{{ translate('PAYKU_BASE_URL') }}" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <input type="hidden" name="types[]" value="PAYKU_PUBLIC_TOKEN">
+                            <div class="col-lg-4">
+                                <label class="col-from-label">{{translate('PAYKU_PUBLIC_TOKEN')}}</label>
+                            </div>
+                            <div class="col-lg-8">
+                                <input type="text" class="form-control" name="PAYKU_PUBLIC_TOKEN" value="{{  env('PAYKU_PUBLIC_TOKEN') }}" placeholder="{{ translate('PAYKU_PUBLIC_TOKEN') }}" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <input type="hidden" name="types[]" value="PAYKU_PRIVATE_TOKEN">
+                            <div class="col-lg-4">
+                                <label class="col-from-label">{{translate('PAYKU_PRIVATE_TOKEN')}}</label>
+                            </div>
+                            <div class="col-lg-8">
+                                <input type="text" class="form-control" name="PAYKU_PRIVATE_TOKEN" value="{{  env('PAYKU_PRIVATE_TOKEN') }}" placeholder="{{ translate('PAYKU_PRIVATE_TOKEN') }}" required>
                             </div>
                         </div>
 

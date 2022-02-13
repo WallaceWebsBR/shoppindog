@@ -48,7 +48,7 @@ class ProductController extends Controller
         $category_ids = CategoryUtility::children_ids($id);
         $category_ids[] = $id;
 
-        $products = Product::whereIn('category_id', $category_ids);
+        $products = Product::whereIn('category_id', $category_ids)->physical();
 
         if ($request->name != "" || $request->name != null) {
             $products = $products->where('name', 'like', '%' . $request->name . '%');
@@ -60,7 +60,7 @@ class ProductController extends Controller
 
     public function brand($id, Request $request)
     {
-        $products = Product::where('brand_id', $id);
+        $products = Product::where('brand_id', $id)->physical();
         if ($request->name != "" || $request->name != null) {
             $products = $products->where('name', 'like', '%' . $request->name . '%');
         }
@@ -71,7 +71,7 @@ class ProductController extends Controller
     public function todaysDeal()
     {
         return Cache::remember('app.todays_deal', 86400, function(){
-            $products = Product::where('todays_deal', 1);
+            $products = Product::where('todays_deal', 1)->physical();
             return new ProductMiniCollection(filter_products($products)->limit(20)->latest()->get());
         });
     }
@@ -86,14 +86,14 @@ class ProductController extends Controller
 
     public function featured()
     {
-        $products = Product::where('featured', 1);
+        $products = Product::where('featured', 1)->physical();
         return new ProductMiniCollection(filter_products($products)->latest()->paginate(10));
     }
 
     public function bestSeller()
     {
         return Cache::remember('app.best_selling_products', 86400, function(){
-            $products = Product::orderBy('num_of_sale', 'desc');
+            $products = Product::orderBy('num_of_sale', 'desc')->physical();
             return new ProductMiniCollection(filter_products($products)->limit(20)->get());
         });
     }
@@ -102,7 +102,7 @@ class ProductController extends Controller
     {
         return Cache::remember("app.related_products-$id", 86400, function() use ($id){
             $product = Product::find($id);
-            $products = Product::where('category_id', $product->category_id)->where('id', '!=', $id);
+            $products = Product::where('category_id', $product->category_id)->where('id', '!=', $id)->physical();
             return new ProductMiniCollection(filter_products($products)->limit(10)->get());
         });
     }
@@ -111,7 +111,7 @@ class ProductController extends Controller
     {
         return Cache::remember("app.top_from_this_seller_products-$id", 86400, function() use ($id){
             $product = Product::find($id);
-            $products = Product::where('user_id', $product->user_id)->orderBy('num_of_sale', 'desc');
+            $products = Product::where('user_id', $product->user_id)->orderBy('num_of_sale', 'desc')->physical();
 
             return new ProductMiniCollection(filter_products($products)->limit(10)->get());
         });
@@ -139,7 +139,7 @@ class ProductController extends Controller
 
         $products = Product::query();
 
-        $products->where('published', 1);
+        $products->where('published', 1)->physical();
 
         if (!empty($brand_ids)) {
             $products->whereIn('brand_id', $brand_ids);
@@ -268,6 +268,6 @@ class ProductController extends Controller
 
     public function home()
     {
-        return new ProductCollection(Product::inRandomOrder()->take(50)->get());
+        return new ProductCollection(Product::inRandomOrder()->physical()->take(50)->get());
     }
 }

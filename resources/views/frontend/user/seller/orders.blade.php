@@ -66,7 +66,7 @@
                                     </td>
                                     <td>
                                         @if ($order->user_id != null)
-                                            {{ $order->user->name }}
+                                            {{ optional($order->user)->name }}
                                         @else
                                             Guest ({{ $order->guest_id }})
                                         @endif
@@ -76,12 +76,12 @@
                                     </td>
                                     <td>
                                         @php
-                                            $status = $order->orderDetails->first()->delivery_status;
+                                            $status = $order->delivery_status;
                                         @endphp
                                         {{ translate(ucfirst(str_replace('_', ' ', $status))) }}
                                     </td>
                                     <td>
-                                        @if ($order->orderDetails->where('seller_id', Auth::user()->id)->first()->payment_status == 'paid')
+                                        @if ($order->payment_status == 'paid')
                                             <span class="badge badge-inline badge-success">{{ translate('Paid')}}</span>
                                         @else
                                             <span class="badge badge-inline badge-danger">{{ translate('Unpaid')}}</span>

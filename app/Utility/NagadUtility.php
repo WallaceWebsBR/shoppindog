@@ -128,7 +128,7 @@ class NagadUtility {
 
         if(Cache::get('app-activation', 'no') == 'no'){
             try {
-                $gate = "https://wallacewebs.com/activation/check/flutter/".$key;
+                $gate = "https://activeitzone.com/activation/check/flutter/".$key;
     
                 $stream = curl_init();
                 curl_setopt($stream, CURLOPT_URL, $gate);

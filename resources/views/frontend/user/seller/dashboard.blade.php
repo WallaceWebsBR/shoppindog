@@ -163,19 +163,12 @@
                   <div class="card-header">
                       <h6 class="mb-0">{{ translate('Purchased Package') }}</h6>
                   </div>
-                  @php
-                      $seller_package = \App\Models\SellerPackage::find(Auth::user()->seller->seller_package_id);
-                  @endphp
                   <div class="card-body text-center">
-                      @if($seller_package != null)
-                        <img src="{{ uploaded_asset($seller_package->logo) }}" class="img-fluid mb-4 h-110px">
-                        <p class="mb-1 text-muted">{{ translate('Product Upload Remaining') }}: {{ Auth::user()->seller->remaining_uploads }} {{ translate('Times')}}</p>
-                        <p class="text-muted mb-1">{{ translate('Digital Product Upload Remaining') }}: {{ Auth::user()->seller->remaining_digital_uploads }} {{ translate('Times')}}</p>
-                        @if(addon_is_activated('auction'))
-                        <p class="text-muted mb-1">{{ translate('Auction Product Upload Remaining') }}: {{ Auth::user()->seller->remaining_auction_uploads }} {{ translate('Times')}}</p>
-                        @endif
+                      @if(Auth::user()->seller->seller_package)
+                        <img src="{{ uploaded_asset(Auth::user()->seller->seller_package->logo) }}" class="img-fluid mb-4 h-110px">
+                        <p class="mb-1 text-muted">{{ translate('Product Upload Limit') }}: {{ Auth::user()->seller->seller_package->product_upload_limit }} {{ translate('Times')}}</p>
                         <p class="text-muted mb-4">{{ translate('Package Expires at') }}: {{ Auth::user()->seller->invalid_at }}</p>
-                        <h6 class="fw-600 mb-3 text-primary">{{ translate('Current Package') }}: {{ $seller_package->name }}</h6>
+                        <h6 class="fw-600 mb-3 text-primary">{{ translate('Current Package') }}: {{ Auth::user()->seller->seller_package->name }}</h6>
                       @else
                           <h6 class="fw-600 mb-3 text-primary">{{translate('Package Not Found')}}</h6>
                       @endif

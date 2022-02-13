@@ -71,7 +71,10 @@ class OrderController extends Controller
             $order->combined_order_id = $combined_order->id;
             $order->user_id = $user->id;
             $order->shipping_address = json_encode($shippingAddress);
-
+            $order->shipping_type = $cartItems->first()->shipping_type;
+            if ($cartItems->first()->shipping_type == 'pickup_point') {
+                $order->pickup_point_id = $cartItems->first()->pickup_point;
+            }
             $order->payment_type = $request->payment_type;
             $order->delivery_viewed = '0';
             $order->payment_status_viewed = '0';

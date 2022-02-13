@@ -37,12 +37,15 @@ class LoginController extends Controller
 
 
     /**
-      * Redirect the user to the Google authentication page.
-      *
-      * @return \Illuminate\Http\Response
-      */
+     * Redirect the user to the Google authentication page.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function redirectToProvider($provider)
     {
+        if(request()->get('query') == 'mobile_app'){
+            request()->session()->put('login_from', 'mobile_app');
+        }
         return Socialite::driver($provider)->redirect();
     }
 
@@ -53,11 +56,13 @@ class LoginController extends Controller
      */
     public function handleProviderCallback(Request $request, $provider)
     {
+        if (session('login_from') == 'mobile_app') {
+            return $this->mobileHandleProviderCallback($request, $provider);
+        }
         try {
-            if($provider == 'twitter'){
+            if ($provider == 'twitter') {
                 $user = Socialite::driver('twitter')->user();
-            }
-            else{
+            } else {
                 $user = Socialite::driver($provider)->stateless()->user();
             }
         } catch (\Exception $e) {
@@ -65,33 +70,73 @@ class LoginController extends Controller
             return redirect()->route('user.login');
         }
 
-        // check if they're an existing user
-        $existingUser = User::where('provider_id', $user->id)->first();
+        //check if provider_id exist
+        $existingUserByProviderId = User::where('provider_id', $user->id)->first();
 
-        if($existingUser){
-            // log them in
-            auth()->login($existingUser, true);
-        } else {
-            // create a new user
-            $newUser                  = new User;
-            $newUser->name            = $user->name;
-            $newUser->email           = $user->email;
-            $newUser->email_verified_at = date('Y-m-d H:m:s');
-            $newUser->provider_id     = $user->id;
-            $newUser->save();
-
-            $customer = new Customer;
-            $customer->user_id = $newUser->id;
-            $customer->save();
-
-            auth()->login($newUser, true);
+        if ($existingUserByProviderId) {
+            //proceed to login
+            auth()->login($existingUserByProviderId, true);
         }
-        if(session('link') != null){
+        else {
+            //check if email exist
+            $existingUser = User::where('email', $user->email)->first();
+
+            if ($existingUser) {
+                //update provider_id
+                $existing_User = $existingUser;
+                $existing_User->provider_id = $user->id;
+                $existing_User->save();
+
+                //proceed to login
+                auth()->login($existing_User, true);
+            } else {
+                //create a new user
+                $newUser = new User;
+                $newUser->name = $user->name;
+                $newUser->email = $user->email;
+                $newUser->email_verified_at = date('Y-m-d Hms');
+                $newUser->provider_id = $user->id;
+                $newUser->save();
+
+                //make user a customer
+                $customer = new Customer;
+                $customer->user_id = $newUser->id;
+                $customer->save();
+
+                //proceed to login
+                auth()->login($newUser, true);
+            }
+        }
+
+        if (session('temp_user_id') != null) {
+            Cart::where('temp_user_id', session('temp_user_id'))
+                ->update([
+                    'user_id' => auth()->user()->id,
+                    'temp_user_id' => null
+                ]);
+
+            Session::forget('temp_user_id');
+        }
+
+        if (session('link') != null) {
             return redirect(session('link'));
-        }
-        else{
+        } else {
             return redirect()->route('dashboard');
         }
+    }
+
+    public function mobileHandleProviderCallback($request, $provider)
+    {
+        $return_provider = '';
+        $result = false;
+        if($provider) {
+            $return_provider = $provider;
+            $result = true;
+        }
+        return response()->json([
+            'result' => $result,
+            'provider' => $return_provider
+        ]);
     }
 
     /**
@@ -112,17 +157,16 @@ class LoginController extends Controller
     }
 
     /**
-    * Get the needed authorization credentials from the request.
-    *
-    * @param  \Illuminate\Http\Request  $request
-    * @return array
-    */
+     * Get the needed authorization credentials from the request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
     protected function credentials(Request $request)
     {
-        if($request->get('phone') != null){
-            return ['phone'=>"+{$request['country_code']}{$request['phone']}", 'password'=>$request->get('password')];
-        }
-        elseif($request->get('email') != null){
+        if ($request->get('phone') != null) {
+            return ['phone' => "+{$request['country_code']}{$request['phone']}", 'password' => $request->get('password')];
+        } elseif ($request->get('email') != null) {
             return $request->only($this->username(), 'password');
         }
     }
@@ -133,28 +177,26 @@ class LoginController extends Controller
      */
     public function authenticated()
     {
-        if(session('temp_user_id') != null){
+        if (session('temp_user_id') != null) {
             Cart::where('temp_user_id', session('temp_user_id'))
-                    ->update(
-                            [
-                                'user_id' => auth()->user()->id,
-                                'temp_user_id' => null
-                            ]
-            );
+                ->update(
+                    [
+                        'user_id' => auth()->user()->id,
+                        'temp_user_id' => null
+                    ]
+                );
 
             Session::forget('temp_user_id');
         }
-        
-        if(auth()->user()->user_type == 'admin' || auth()->user()->user_type == 'staff')
-        {
+
+        if (auth()->user()->user_type == 'admin' || auth()->user()->user_type == 'staff') {
             CoreComponentRepository::instantiateShopRepository();
             return redirect()->route('admin.dashboard');
         } else {
 
-            if(session('link') != null){
+            if (session('link') != null) {
                 return redirect(session('link'));
-            }
-            else{
+            } else {
                 return redirect()->route('dashboard');
             }
         }
@@ -182,18 +224,17 @@ class LoginController extends Controller
      */
     public function logout(Request $request)
     {
-        if(auth()->user() != null && (auth()->user()->user_type == 'admin' || auth()->user()->user_type == 'staff')){
+        if (auth()->user() != null && (auth()->user()->user_type == 'admin' || auth()->user()->user_type == 'staff')) {
             $redirect_route = 'login';
-        }
-        else{
+        } else {
             $redirect_route = 'home';
         }
-        
+
         //User's Cart Delete
-        if(auth()->user()){
+        if (auth()->user()) {
             Cart::where('user_id', auth()->user()->id)->delete();
         }
-        
+
         $this->guard()->logout();
 
         $request->session()->invalidate();

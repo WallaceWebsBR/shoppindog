@@ -1,4 +1,4 @@
-<script src="//voguepay.com/js/voguepay.js"></script>
+<script src="//pay.voguepay.com/js/voguepay.js"></script>
 
 <script>
     closedFunction=function() {

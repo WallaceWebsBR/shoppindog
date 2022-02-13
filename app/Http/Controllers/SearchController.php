@@ -176,7 +176,8 @@ class SearchController extends Controller
                                 });
                             }
                         })
-                    ->get();
+                        ->limit(3)
+                        ->get();
 
         $categories = Category::where('name', 'like', '%'.$query.'%')->get()->take(3);
 

@@ -20,6 +20,8 @@ use App\Models\Coupon;
 use Cookie;
 use Illuminate\Support\Str;
 use App\Mail\SecondEmailVerifyMailManager;
+use App\Models\AffiliateConfig;
+use App\Models\Page;
 use Mail;
 use Illuminate\Auth\Events\PasswordReset;
 use Cache;
@@ -58,12 +60,9 @@ class HomeController extends Controller
         if(Auth::check()){
             return redirect()->route('home');
         }
-        if($request->has('referral_code') &&
-                \App\Models\Addon::where('unique_identifier', 'affiliate_system')->first() != null &&
-                \App\Models\Addon::where('unique_identifier', 'affiliate_system')->first()->activated) {
-
+        if($request->has('referral_code') && addon_is_activated('affiliate_system')) {
             try {
-                $affiliate_validation_time = \App\AffiliateConfig::where('type', 'validation_time')->first();
+                $affiliate_validation_time = AffiliateConfig::where('type', 'validation_time')->first();
                 $cookie_minute = 30 * 24;
                 if($affiliate_validation_time) {
                     $cookie_minute = $affiliate_validation_time->value * 60;
@@ -150,36 +149,6 @@ class HomeController extends Controller
             return view('frontend.user.profile');
         }
     }
-
-    public function customer_update_profile(Request $request)
-    {
-        if(env('DEMO_MODE') == 'On'){
-            flash(translate('Sorry! the action is not permitted in demo '))->error();
-            return back();
-        }
-
-        $user = Auth::user();
-        $user->name = $request->name;
-        $user->address = $request->address;
-        $user->country = $request->country;
-        $user->city = $request->city;
-        $user->postal_code = $request->postal_code;
-        $user->phone = $request->phone;
-
-        if($request->new_password != null && ($request->new_password == $request->confirm_password)){
-            $user->password = Hash::make($request->new_password);
-        }
-        $user->avatar_original = $request->photo;
-
-        if($user->save()){
-            flash(translate('Your Profile has been updated successfully!'))->success();
-            return back();
-        }
-
-        flash(translate('Sorry! Something went wrong.'))->error();
-        return back();
-    }
-
 
     public function userProfileUpdate(Request $request)
     {
@@ -272,7 +241,7 @@ class HomeController extends Controller
         if($detailedProduct != null && $detailedProduct->published){
             if($request->has('product_referral_code') && addon_is_activated('affiliate_system')) {
 
-                $affiliate_validation_time = \App\AffiliateConfig::where('type', 'validation_time')->first();
+                $affiliate_validation_time = AffiliateConfig::where('type', 'validation_time')->first();
                 $cookie_minute = 30 * 24;
                 if($affiliate_validation_time) {
                     $cookie_minute = $affiliate_validation_time->value * 60;
@@ -333,8 +302,9 @@ class HomeController extends Controller
 
     public function show_product_upload_form(Request $request)
     {
+        $seller = Auth::user()->seller;
         if(addon_is_activated('seller_subscription')){
-            if(Auth::user()->seller->remaining_uploads > 0){
+            if($seller->seller_package && $seller->seller_package->product_upload_limit > $seller->user->products()->count()){
                 $categories = Category::where('parent_id', 0)
                     ->where('digital', 0)
                     ->with('childrenCategories')
@@ -504,23 +474,28 @@ class HomeController extends Controller
     }
 
     public function sellerpolicy(){
-        return view("frontend.policies.sellerpolicy");
+        $page =  Page::where('type', 'seller_policy_page')->first();
+        return view("frontend.policies.sellerpolicy", compact('page'));
     }
 
     public function returnpolicy(){
-        return view("frontend.policies.returnpolicy");
+        $page =  Page::where('type', 'return_policy_page')->first();
+        return view("frontend.policies.returnpolicy", compact('page'));
     }
 
     public function supportpolicy(){
-        return view("frontend.policies.supportpolicy");
+        $page =  Page::where('type', 'support_policy_page')->first();
+        return view("frontend.policies.supportpolicy", compact('page'));
     }
 
     public function terms(){
-        return view("frontend.policies.terms");
+        $page =  Page::where('type', 'terms_conditions_page')->first();
+        return view("frontend.policies.terms", compact('page'));
     }
 
     public function privacypolicy(){
-        return view("frontend.policies.privacypolicy");
+        $page =  Page::where('type', 'privacy_policy_page')->first();
+        return view("frontend.policies.privacypolicy", compact('page'));
     }
 
     public function get_pick_up_points(Request $request)
@@ -547,9 +522,9 @@ class HomeController extends Controller
     }
     public function show_digital_product_upload_form(Request $request)
     {
+        $seller = Auth::user()->seller;
         if(addon_is_activated('seller_subscription')){
-            if(Auth::user()->seller->remaining_digital_uploads > 0){
-                $business_settings = BusinessSetting::where('type', 'digital_product_upload')->first();
+            if($seller->seller_package && $seller->seller_package->product_upload_limit > $seller->user->products()->count()){
                 $categories = Category::where('digital', 1)->get();
                 return view('frontend.user.seller.digitalproducts.product_upload', compact('categories'));
             }
@@ -558,8 +533,6 @@ class HomeController extends Controller
                 return back();
             }
         }
-
-        $business_settings = BusinessSetting::where('type', 'digital_product_upload')->first();
         $categories = Category::where('digital', 1)->get();
         return view('frontend.user.seller.digitalproducts.product_upload', compact('categories'));
     }

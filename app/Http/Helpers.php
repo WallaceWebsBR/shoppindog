@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ClubPointController;
 use App\Http\Controllers\AffiliateController;
+use App\Http\Controllers\CommissionController;
 use App\Models\Currency;
 use App\Models\BusinessSetting;
 use App\Models\ProductStock;
@@ -15,7 +16,8 @@ use App\Models\Wallet;
 use App\Models\CombinedOrder;
 use App\Models\User;
 use App\Models\Addon;
-use App\Http\Controllers\CommissionController;
+use App\Models\Product;
+use App\Models\Shop;
 use App\Utility\SendSMSUtility;
 use App\Utility\NotificationUtility;
 
@@ -492,10 +494,16 @@ function getShippingCost($carts, $index)
 {
     $admin_products = array();
     $seller_products = array();
-    $calculate_shipping = 0;
+
+    $cartItem = $carts[$index];
+    $product = Product::find($cartItem['product_id']);
+
+    if ($product->digital == 1) {
+        return 0;
+    }
 
     foreach ($carts as $key => $cartItem) {
-        $product = \App\Models\Product::find($cartItem['product_id']);
+        $product = Product::find($cartItem['product_id']);
         if ($product->added_by == 'admin') {
             array_push($admin_products, $cartItem['product_id']);
         } else {
@@ -508,48 +516,29 @@ function getShippingCost($carts, $index)
         }
     }
 
-    //Calculate Shipping Cost
     if (get_setting('shipping_type') == 'flat_rate') {
-        $calculate_shipping = get_setting('flat_rate_shipping_cost');
-    } elseif (get_setting('shipping_type') == 'seller_wise_shipping') {
-        if (!empty($admin_products)) {
-            $calculate_shipping = get_setting('shipping_cost_admin');
-        }
-        if (!empty($seller_products)) {
-            foreach ($seller_products as $key => $seller_product) {
-                $calculate_shipping += \App\Models\Shop::where('user_id', $key)->first()->shipping_cost;
-            }
-        }
-    } elseif (get_setting('shipping_type') == 'area_wise_shipping') {
-        $shipping_info = Address::where('id', $carts[0]['address_id'])->first();
-        $city = City::where('name', $shipping_info->city)->first();
-        if ($city != null) {
-            $calculate_shipping = $city->cost;
-        }
+        return get_setting('flat_rate_shipping_cost') / count($carts);
     }
-
-    $cartItem = $carts[$index];
-    $product = \App\Models\Product::find($cartItem['product_id']);
-
-    if ($product->digital == 1) {
-        return $calculate_shipping = 0;
-    }
-
-    if (get_setting('shipping_type') == 'flat_rate') {
-        return $calculate_shipping / count($carts);
-    } elseif (get_setting('shipping_type') == 'seller_wise_shipping') {
+    elseif (get_setting('shipping_type') == 'seller_wise_shipping') {
         if ($product->added_by == 'admin') {
             return get_setting('shipping_cost_admin') / count($admin_products);
         } else {
-            return \App\Models\Shop::where('user_id', $product->user_id)->first()->shipping_cost / count($seller_products[$product->user_id]);
+            return Shop::where('user_id', $product->user_id)->first()->shipping_cost / count($seller_products[$product->user_id]);
         }
-    } elseif (get_setting('shipping_type') == 'area_wise_shipping') {
-        if ($product->added_by == 'admin') {
-            return $calculate_shipping / count($admin_products);
-        } else {
-            return $calculate_shipping / count($seller_products[$product->user_id]);
+    }
+    elseif (get_setting('shipping_type') == 'area_wise_shipping') {
+        $shipping_info = Address::where('id', $carts[0]['address_id'])->first();
+        $city = City::where('id', $shipping_info->city_id)->first();
+        if ($city != null) {
+            if ($product->added_by == 'admin') {
+                return $city->cost / count($admin_products);
+            } else {
+                return $city->cost / count($seller_products[$product->user_id]);
+            }
         }
-    } else {
+        return 0;
+    }
+    else {
         if($product->is_quantity_multiplied && get_setting('shipping_type') == 'product_wise_shipping') {
             return  $product->shipping_cost * $cartItem['quantity'];
         }

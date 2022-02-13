@@ -20,7 +20,7 @@ use App\OtpConfiguration;
 use App\Models\User;
 use App\Models\BusinessSetting;
 use App\Models\CombinedOrder;
-use App\SmsTemplate;
+use App\Models\SmsTemplate;
 use Auth;
 use Session;
 use DB;
@@ -206,14 +206,11 @@ class OrderController extends Controller
     {
         $date = $request->date;
         $sort_search = null;
-
+        $orders = Order::query();
         if (Auth::user()->user_type == 'staff' && Auth::user()->staff->pick_up_point != null) {
-            $orders = DB::table('orders')
-                ->orderBy('code', 'desc')
-                ->join('order_details', 'orders.id', '=', 'order_details.order_id')
-                ->where('order_details.pickup_point_id', Auth::user()->staff->pick_up_point->id)
-                ->select('orders.id')
-                ->distinct();
+            $orders->where('shipping_type', 'pickup_point')
+                    ->where('pickup_point_id', Auth::user()->staff->pick_up_point->id)
+                    ->orderBy('code', 'desc');
 
             if ($request->has('search')) {
                 $sort_search = $request->search;
@@ -227,12 +224,7 @@ class OrderController extends Controller
 
             return view('backend.sales.pickup_point_orders.index', compact('orders', 'sort_search', 'date'));
         } else {
-            $orders = DB::table('orders')
-                ->orderBy('code', 'desc')
-                ->join('order_details', 'orders.id', '=', 'order_details.order_id')
-                ->where('order_details.shipping_type', 'pickup_point')
-                ->select('orders.id')
-                ->distinct();
+            $orders->where('shipping_type', 'pickup_point')->orderBy('code', 'desc');
 
             if ($request->has('search')) {
                 $sort_search = $request->search;
@@ -303,6 +295,7 @@ class OrderController extends Controller
         }
 
         $address = Address::where('id', $carts[0]['address_id'])->first();
+
         $shippingAddress = [];
         if ($address != null) {
             $shippingAddress['name']        = Auth::user()->name;
@@ -339,7 +332,10 @@ class OrderController extends Controller
             $order->combined_order_id = $combined_order->id;
             $order->user_id = Auth::user()->id;
             $order->shipping_address = $combined_order->shipping_address;
-
+            $order->shipping_type = $carts[0]['shipping_type'];
+            if ($carts[0]['shipping_type'] == 'pickup_point') {
+                $order->pickup_point_id = $cartItem['pickup_point'];
+            }
             $order->payment_type = $request->payment_option;
             $order->delivery_viewed = '0';
             $order->payment_status_viewed = '0';
@@ -384,10 +380,6 @@ class OrderController extends Controller
                 $order_detail->shipping_cost = $cartItem['shipping_cost'];
 
                 $shipping += $order_detail->shipping_cost;
-
-                if ($cartItem['shipping_type'] == 'pickup_point') {
-                    $order_detail->pickup_point_id = $cartItem['pickup_point'];
-                }
                 //End of storing shipping cost
 
                 $order_detail->quantity = $cartItem['quantity'];
@@ -633,20 +625,13 @@ class OrderController extends Controller
         return 1;
     }
 
-//    public function bulk_order_status(Request $request) {
-////        dd($request->all());
-//        if($request->id) {
-//            foreach ($request->id as $order_id) {
-//                $order = Order::findOrFail($order_id);
-//                $order->delivery_viewed = '0';
-//                $order->save();
-//
-//                $this->change_status($order, $request);
-//            }
-//        }
-//
-//        return 1;
-//    }
+   public function update_tracking_code(Request $request) {
+        $order = Order::findOrFail($request->order_id);
+        $order->tracking_code = $request->tracking_code;
+        $order->save();
+
+        return 1;
+   }
 
     public function update_payment_status(Request $request)
     {

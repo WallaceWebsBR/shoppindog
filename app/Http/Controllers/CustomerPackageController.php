@@ -199,17 +199,13 @@ class CustomerPackageController extends Controller
         } else if ($request->payment_option == 'iyzico') {
             $iyzico = new IyzicoController();
             return $iyzico->pay();
-        } elseif ($request->payment_option == 'proxypay') {
-            $proxy = new ProxypayController;
-            return $proxy->create_reference($request);
         } else if ($request->payment_option == 'nagad') {
             $nagad = new NagadController();
             return $nagad->getSession();
         } else if ($request->payment_option == 'bkash') {
             $bkash = new BkashController();
             return $bkash->pay();
-        }
-        else if ($request->payment_option == 'mpesa') {
+        } else if ($request->payment_option == 'mpesa') {
             $mpesa = new MpesaController();
             return $mpesa->pay();
         } else if ($request->payment_option == 'flutterwave') {

@@ -141,12 +141,12 @@
                         <!--Submenu-->
                         <ul class="aiz-side-nav-list level-2">
                             <li class="aiz-side-nav-item">
-                                <a class="aiz-side-nav-link" href="{{route('auction_products.create')}}">
+                                <a class="aiz-side-nav-link" href="{{route('auction_product_create.admin')}}">
                                     <span class="aiz-side-nav-text">{{translate('Add New auction product')}}</span>
                                 </a>
                             </li>
                             <li class="aiz-side-nav-item">
-                                <a href="{{route('auction.all_products')}}" class="aiz-side-nav-link {{ areActiveRoutes(['auction_products.edit','product_bids.show']) }}">
+                                <a href="{{route('auction.all_products')}}" class="aiz-side-nav-link {{ areActiveRoutes(['auction_product_edit.admin','product_bids.admin']) }}">
                                     <span class="aiz-side-nav-text">{{ translate('All Auction Products') }}</span>
                                 </a>
                             </li>
@@ -183,13 +183,23 @@
                         <!--Submenu-->
                         <ul class="aiz-side-nav-list level-2">
                             <li class="aiz-side-nav-item">
-                                <a class="aiz-side-nav-link" href="{{route('wholesale-products.create')}}">
-                                    <span class="aiz-side-nav-text">{{translate('Add new wholesale product')}}</span>
+                                <a class="aiz-side-nav-link" href="{{route('wholesale_product_create.admin')}}">
+                                    <span class="aiz-side-nav-text">{{translate('Add New Wholesale Product')}}</span>
                                 </a>
                             </li>
                             <li class="aiz-side-nav-item">
-                                <a href="{{route('wholesale-products.index')}}" class="aiz-side-nav-link {{ areActiveRoutes(['wholesale-products.edit','wholesale-products.show']) }}">
-                                    <span class="aiz-side-nav-text">{{ translate('All wholesale products') }}</span>
+                                <a href="{{route('wholesale_products.all')}}" class="aiz-side-nav-link {{ areActiveRoutes(['wholesale_product_edit.admin']) }}">
+                                    <span class="aiz-side-nav-text">{{ translate('All Wholesale Products') }}</span>
+                                </a>
+                            </li>
+                            <li class="aiz-side-nav-item">
+                                <a href="{{route('wholesale_products.in_house')}}" class="aiz-side-nav-link {{ areActiveRoutes(['wholesale_product_edit.admin']) }}">
+                                    <span class="aiz-side-nav-text">{{ translate('In House Wholesale Products') }}</span>
+                                </a>
+                            </li>
+                            <li class="aiz-side-nav-item">
+                                <a href="{{route('wholesale_products.seller')}}" class="aiz-side-nav-link {{ areActiveRoutes(['wholesale_product_edit.admin']) }}">
+                                    <span class="aiz-side-nav-text">{{ translate('Seller Wholesale Products') }}</span>
                                 </a>
                             </li>
                         </ul>

@@ -18,7 +18,7 @@
                       <i class="las la-upload la-2x text-white"></i>
                   </span>
                   <div class="px-3 pt-3 pb-3">
-                      <div class="h4 fw-700 text-center">{{ max(0, Auth::user()->seller->remaining_uploads) }}</div>
+                      <div class="h4 fw-700 text-center">{{ max(0, optional(auth()->user()->seller->seller_package)->product_upload_limit - auth()->user()->products()->count()) }}</div>
                       <div class="opacity-50 text-center">{{  translate('Remaining Uploads') }}</div>
                   </div>
                 </div>
@@ -78,6 +78,9 @@
                         <th data-breakpoints="md">{{ translate('Category')}}</th>
                         <th data-breakpoints="md">{{ translate('Current Qty')}}</th>
                         <th>{{ translate('Base Price')}}</th>
+                        @if(get_setting('product_approve_by_admin') == 1)
+                            <th data-breakpoints="md">{{ translate('Approval')}}</th>
+                        @endif
                         <th data-breakpoints="md">{{ translate('Published')}}</th>
                         <th data-breakpoints="md">{{ translate('Featured')}}</th>
                         <th data-breakpoints="md" class="text-right">{{ translate('Options')}}</th>
@@ -108,6 +111,15 @@
                                 @endphp
                             </td>
                             <td>{{ $product->unit_price }}</td>
+                            @if(get_setting('product_approve_by_admin') == 1)
+                                <td>
+                                    @if ($product->approved == 1)
+                                        <span class="badge badge-inline badge-success">{{ translate('Approved')}}</span>
+                                    @else
+                                        <span class="badge badge-inline badge-info">{{ translate('Pending')}}</span>
+                                    @endif
+                                </td>
+                            @endif
                             <td>
                                 <label class="aiz-switch aiz-switch-success mb-0">
                                     <input onchange="update_published(this)" value="{{ $product->id }}" type="checkbox" <?php if($product->published == 1) echo "checked";?> >

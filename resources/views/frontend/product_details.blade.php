@@ -349,12 +349,8 @@
 
                             <div class="mt-3">
                                 @if ($detailedProduct->external_link != null)
-                                    <a type="button" class="btn btn-soft-primary mr-2 add-to-cart fw-600" href="{{ $detailedProduct->external_link }}">
-                                        <i class="las la-shopping-bag"></i>
-                                        <span class="d-none d-md-inline-block"> {{ translate('Add to cart')}}</span>
-                                    </a>
                                     <a type="button" class="btn btn-primary buy-now fw-600" href="{{ $detailedProduct->external_link }}">
-                                        <i class="la la-shopping-cart"></i> {{ translate('Buy Now')}}
+                                        <i class="la la-share"></i> {{ translate($detailedProduct->external_link_btn)}}
                                     </a>
                                 @else
                                     <button type="button" class="btn btn-soft-primary mr-2 add-to-cart fw-600" onclick="addToCart()">
@@ -382,7 +378,7 @@
                                     <button type="button" class="btn btn-link btn-icon-left fw-600" onclick="addToCompare({{ $detailedProduct->id }})">
                                         {{ translate('Add to compare')}}
                                     </button>
-                                    @if(Auth::check() && addon_is_activated('affiliate_system') && (\App\AffiliateOption::where('type', 'product_sharing')->first()->status || \App\AffiliateOption::where('type', 'category_wise_affiliate')->first()->status) && Auth::user()->affiliate_user != null && Auth::user()->affiliate_user->status)
+                                    @if(Auth::check() && addon_is_activated('affiliate_system') && (\App\Models\AffiliateOption::where('type', 'product_sharing')->first()->status || \App\Models\AffiliateOption::where('type', 'category_wise_affiliate')->first()->status) && Auth::user()->affiliate_user != null && Auth::user()->affiliate_user->status)
                                         @php
                                             if(Auth::check()){
                                                 if(Auth::user()->referral_code == null){

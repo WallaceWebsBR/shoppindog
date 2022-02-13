@@ -67,6 +67,11 @@
                                 $seller_products[$product->user_id] = $product_ids;
                             }
                         }
+						
+						$pickup_point_list = array();
+						if (get_setting('pickup_point') == 1) {
+							$pickup_point_list = \App\Models\PickupPoint::where('pick_up_status',1)->get();
+						}
                     @endphp
 
                     @if (!empty($admin_products))
@@ -117,7 +122,7 @@
                                                 </span>
                                             </label>
                                         </div>
-                                        @if (\App\Models\BusinessSetting::where('type', 'pickup_point')->first()->value == 1)
+                                        @if ($pickup_point_list)
                                         <div class="col-6">
                                             <label class="aiz-megabox d-block bg-white mb-0">
                                                 <input
@@ -135,6 +140,7 @@
                                         </div>
                                         @endif
                                     </div>
+									@if ($pickup_point_list)
                                     <div class="mt-4 pickup_point_id_admin d-none">
                                         <select
                                             class="form-control aiz-selectpicker"
@@ -142,7 +148,7 @@
                                             data-live-search="true"
                                         >
                                                 <option>{{ translate('Select your nearest pickup point')}}</option>
-                                            @foreach (\App\Models\PickupPoint::where('pick_up_status',1)->get() as $key => $pick_up_point)
+                                            @foreach ($pickup_point_list as $key => $pick_up_point)
                                                 <option
                                                     value="{{ $pick_up_point->id }}"
                                                     data-content="<span class='d-block'>
@@ -155,6 +161,7 @@
                                             @endforeach
                                         </select>
                                     </div>
+									@endif
                                 </div>
                             </div>
                             
@@ -210,8 +217,7 @@
                                                         </span>
                                                     </label>
                                                 </div>
-                                                @if (\App\Models\BusinessSetting::where('type', 'pickup_point')->first()->value == 1)
-                                                    @if (is_array(json_decode(\App\Models\Shop::where('user_id', $key)->first()->pick_up_point_id)))
+                                                @if ($pickup_point_list)
                                                     <div class="col-6">
                                                         <label class="aiz-megabox d-block bg-white mb-0">
                                                             <input
@@ -227,19 +233,17 @@
                                                             </span>
                                                         </label>
                                                     </div>
-                                                    @endif
                                                 @endif
                                             </div>
-                                            @if (\App\Models\BusinessSetting::where('type', 'pickup_point')->first()->value == 1)
-                                                @if (is_array(json_decode(\App\Models\Shop::where('user_id', $key)->first()->pick_up_point_id)))
+                                            @if ($pickup_point_list)
                                                 <div class="mt-4 pickup_point_id_{{ $key }} d-none">
                                                     <select
                                                         class="form-control aiz-selectpicker"
                                                         name="pickup_point_id_{{ $key }}"
                                                         data-live-search="true"
                                                     >
-                                                            <option>{{ translate('Select your nearest pickup point')}}</option>
-                                                            @foreach (\App\Models\PickupPoint::where('pick_up_status',1)->get() as $key => $pick_up_point)
+                                                        <option>{{ translate('Select your nearest pickup point')}}</option>
+                                                            @foreach ($pickup_point_list as $key => $pick_up_point)
                                                             <option
                                                                 value="{{ $pick_up_point->id }}"
                                                                 data-content="<span class='d-block'>
@@ -249,10 +253,9 @@
                                                                             </span>"
                                                             >
                                                             </option>
-                                                        @endforeach
+															@endforeach
                                                     </select>
                                                 </div>
-                                                @endif
                                             @endif
                                         </div>
                                     </div>

@@ -65,10 +65,7 @@
                             </div>
                         </div>
 
-                        @php
-                        $pos_addon = \App\Models\Addon::where('unique_identifier', 'pos_system')->first();
-                        @endphp
-                        @if ($pos_addon != null && $pos_addon->activated == 1)
+                        @if (addon_is_activated('pos_system'))
                         <div class="form-group row">
                             <label class="col-md-3 col-from-label">{{translate('Barcode')}}</label>
                             <div class="col-md-8">
@@ -77,10 +74,7 @@
                         </div>
                         @endif
 
-                        @php
-                        $refund_request_addon = \App\Models\Addon::where('unique_identifier', 'refund_request')->first();
-                        @endphp
-                        @if ($refund_request_addon != null && $refund_request_addon->activated == 1)
+                        @if (addon_is_activated('refund_request'))
                         <div class="form-group row">
                             <label class="col-md-3 col-from-label">{{translate('Refundable')}}</label>
                             <div class="col-md-8">
@@ -232,8 +226,7 @@
                             </div>
                         </div>
 
-                        @if(\App\Models\Addon::where('unique_identifier', 'club_point')->first() != null &&
-                            \App\Models\Addon::where('unique_identifier', 'club_point')->first()->activated)
+                        @if(addon_is_activated('club_point'))
                             <div class="form-group row">
                                 <label class="col-md-3 col-from-label">
                                     {{translate('Set Point')}}
@@ -266,6 +259,15 @@
                             </label>
                             <div class="col-md-9">
                                 <input type="text" placeholder="{{ translate('External link') }}" name="external_link" class="form-control">
+                                <small class="text-muted">{{translate('Leave it blank if you do not use external site link')}}</small>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-3 col-from-label">
+                                {{translate('External link button text')}}
+                            </label>
+                            <div class="col-md-9">
+                                <input type="text" placeholder="{{ translate('External link button text') }}" name="external_link_btn" class="form-control">
                                 <small class="text-muted">{{translate('Leave it blank if you do not use external site link')}}</small>
                             </div>
                         </div>

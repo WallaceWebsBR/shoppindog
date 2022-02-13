@@ -2,7 +2,7 @@
 
 namespace App\Utility;
 
-use App\OtpConfiguration;
+use App\Models\OtpConfiguration;
 use App\Utility\MimoUtility;
 use Twilio\Rest\Client;
 

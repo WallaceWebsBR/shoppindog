@@ -17,7 +17,6 @@
 			<td class="text-center" data-breakpoints="lg">
 				{{translate('Photo')}}
 			</td>
-			<td></td>
 		</tr>
 	</thead>
 	<tbody>
@@ -70,9 +69,6 @@
 						<input type="hidden" name="img_{{ $str }}" class="selected-files">
 					</div>
 					<div class="file-preview box sm"></div>
-				</td>
-				<td>
-					<button type="button" class="btn btn-icon btn-sm btn-danger" onclick="delete_variant(this)"><i class="las la-trash"></i></button>
 				</td>
 			</tr>
 		@endif

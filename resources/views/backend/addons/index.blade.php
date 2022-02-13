@@ -35,7 +35,7 @@
                                             </div>
                                             @if (env('DEMO_MODE') != 'On')
                                                 <div class="mr-md-3 ml-0">
-                                                    <p><small>{{ translate('Purchase code')}}: </small></p>
+                                                    <p><small>{{ translate('Purchase code')}}: </small>{{ $addon->purchase_code }}</p>
                                                 </div>
                                             @endif
                                             <div class="ml-auto mr-0">
@@ -92,7 +92,7 @@
         }
 
         $(document).ready(function(){
-            $.post('https://wallacewebs.com/addons/public/addons', {item: 'ecommerce'}, function(data){
+            $.post('https://activeitzone.com/addons/public/addons', {item: 'ecommerce'}, function(data){
                 //console.log(data);
                 html = '';
                 data.forEach((item, i) => {

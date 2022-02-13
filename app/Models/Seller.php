@@ -16,4 +16,8 @@ class Seller extends Model
   public function payments(){
   	return $this->hasMany(Payment::class);
   }
+
+  public function seller_package(){
+    return $this->belongsTo(SellerPackage::class);
+}
 }

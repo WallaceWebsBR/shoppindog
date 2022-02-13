@@ -260,7 +260,7 @@ class CustomerProductController extends Controller
 
     public function search(Request $request)
     {
-        $query = $request->q;
+        // $query = $request->q;
         $brand_id = (Brand::where('slug', $request->brand)->first() != null) ? Brand::where('slug', $request->brand)->first()->id : null;
         $category_id = (Category::where('slug', $request->category)->first() != null) ? Category::where('slug', $request->category)->first()->id : null;
         $sort_by = $request->sort_by;
@@ -281,9 +281,9 @@ class CustomerProductController extends Controller
             $customer_products = $customer_products->whereIn('category_id', $category_ids);
         }
 
-        if($query != null){
-            $customer_products = $customer_products->where('name', 'like', '%'.$query.'%')->orWhere('tags', 'like', '%'.$query.'%');
-        }
+        // if($query != null){
+        //     $customer_products = $customer_products->where('name', 'like', '%'.$query.'%')->orWhere('tags', 'like', '%'.$query.'%');
+        // }
 
         if($sort_by != null){
             switch ($sort_by) {
@@ -317,6 +317,6 @@ class CustomerProductController extends Controller
 
         $customer_products = $customer_products->paginate(12)->appends(request()->query());
 
-        return view('frontend.customer_product_listing', compact('customer_products', 'query', 'category_id', 'brand_id', 'sort_by', 'condition'));
+        return view('frontend.customer_product_listing', compact('customer_products', 'category_id', 'brand_id', 'sort_by', 'condition'));
     }
 }

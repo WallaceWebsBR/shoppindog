@@ -11,13 +11,15 @@ use App\Models\FlashDealProduct;
 use App\Models\ProductTax;
 use App\Models\AttributeValue;
 use App\Models\Cart;
+use App\Models\Color;
+use App\Models\User;
 use Auth;
 use Carbon\Carbon;
 use Combinations;
 use CoreComponentRepository;
-use Illuminate\Support\Str;
 use Artisan;
 use Cache;
+use Str;
 
 class ProductController extends Controller
 {
@@ -35,7 +37,7 @@ class ProductController extends Controller
         $query = null;
         $sort_search = null;
 
-        $products = Product::where('added_by', 'admin')->where('auction_product',0);
+        $products = Product::where('added_by', 'admin')->where('auction_product',0)->where('wholesale_product',0);
 
         if ($request->type != null){
             $var = explode(",", $request->type);
@@ -66,7 +68,7 @@ class ProductController extends Controller
         $query = null;
         $seller_id = null;
         $sort_search = null;
-        $products = Product::where('added_by', 'seller')->where('auction_product',0);
+        $products = Product::where('added_by', 'seller')->where('auction_product',0)->where('wholesale_product',0);
         if ($request->has('user_id') && $request->user_id != null) {
             $products = $products->where('user_id', $request->user_id);
             $seller_id = $request->user_id;
@@ -96,7 +98,7 @@ class ProductController extends Controller
         $query = null;
         $seller_id = null;
         $sort_search = null;
-        $products = Product::orderBy('created_at', 'desc')->where('auction_product',0);
+        $products = Product::orderBy('created_at', 'desc')->where('auction_product',0)->where('wholesale_product',0);
         if ($request->has('user_id') && $request->user_id != null) {
             $products = $products->where('user_id', $request->user_id);
             $seller_id = $request->user_id;
@@ -168,7 +170,7 @@ class ProductController extends Controller
             }
         }
         else{
-            $product->user_id = \App\Models\User::where('user_type', 'admin')->first()->id;
+            $product->user_id = User::where('user_type', 'admin')->first()->id;
         }
         $product->category_id = $request->category_id;
         $product->brand_id = $request->brand_id;
@@ -189,6 +191,7 @@ class ProductController extends Controller
         $product->low_stock_quantity = $request->low_stock_quantity;
         $product->stock_visibility_state = $request->stock_visibility_state;
         $product->external_link = $request->external_link;
+        $product->external_link_btn = $request->external_link_btn;
 
         $tags = array();
         if($request->tags[0] != null){
@@ -260,12 +263,12 @@ class ProductController extends Controller
             $product->pdf = $request->pdf->store('uploads/products/pdf');
         }
 
-        $product->slug = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', strtolower($request->name)));
+        $slug = $request->slug? Str::slug($request->slug, '-') : Str::slug($request->name, '-');
+        $same_slug_count = Product::where('slug','LIKE',$slug.'%')->count();
+        $slug_suffix = $same_slug_count ? '-'.$same_slug_count+1 : '';
+        $slug .= $slug_suffix;
 
-        if(Product::where('slug', $product->slug)->count() > 0){
-            flash(translate('Another product exists with same slug. Please change the slug!'))->warning();
-            return back();
-        }
+        $product->slug = $slug;
 
         if($request->has('colors_active') && $request->has('colors') && count($request->colors) > 0){
             $product->colors = json_encode($request->colors);
@@ -375,7 +378,7 @@ class ProductController extends Controller
                     }
                     else{
                         if($request->has('colors_active') && $request->has('colors') && count($request->colors) > 0){
-                            $color_name = \App\Models\Color::where('code', $item)->first()->name;
+                            $color_name = Color::where('code', $item)->first()->name;
                             $str .= $color_name;
                         }
                         else{
@@ -518,18 +521,15 @@ class ProductController extends Controller
         if($request->lang == env("DEFAULT_LANGUAGE")){
             $product->name          = $request->name;
             $product->unit          = $request->unit;
-            $product->description   = $request->description;
-            $product->slug          = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', strtolower($request->slug)));
+            $product->description   = $request->description;            
         }
 
-        if($request->slug == null){
-            $product->slug = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', strtolower($request->name)));
-        }
+        $slug = $request->slug? Str::slug($request->slug, '-') : Str::slug($request->name, '-');
+        $same_slug_count = Product::where('slug','LIKE',$slug.'%')->count();
+        $slug_suffix = $same_slug_count > 1 ? '-'.$same_slug_count+1 : '';
+        $slug .= $slug_suffix;
 
-        if(Product::where('id', '!=', $product->id)->where('slug', $product->slug)->count() > 0){
-            flash(translate('Another product exists with same slug. Please change the slug!'))->warning();
-            return back();
-        }
+        $product->slug = $slug;
 
         $product->photos                 = $request->photos;
         $product->thumbnail_img          = $request->thumbnail_img;
@@ -537,6 +537,7 @@ class ProductController extends Controller
         $product->low_stock_quantity     = $request->low_stock_quantity;
         $product->stock_visibility_state = $request->stock_visibility_state;
         $product->external_link = $request->external_link;
+        $product->external_link_btn = $request->external_link_btn;
 
         $tags = array();
         if($request->tags[0] != null){
@@ -681,7 +682,7 @@ class ProductController extends Controller
                     }
                     else{
                         if($request->has('colors_active') && $request->has('colors') && count($request->colors) > 0){
-                            $color_name = \App\Models\Color::where('code', $item)->first()->name;
+                            $color_name = Color::where('code', $item)->first()->name;
                             $str .= $color_name;
                         }
                         else{
@@ -880,7 +881,7 @@ class ProductController extends Controller
 
         if($product->added_by == 'seller' && addon_is_activated('seller_subscription')){
             $seller = $product->user->seller;
-            if($seller->invalid_at != null && Carbon::now()->diffInDays(Carbon::parse($seller->invalid_at), false) <= 0){
+            if($seller->invalid_at != null && $seller->invalid_at != '0000-00-00' && Carbon::now()->diffInDays(Carbon::parse($seller->invalid_at), false) <= 0){
                 return 0;
             }
         }

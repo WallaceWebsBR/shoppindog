@@ -21,9 +21,8 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, To
     
     public function collection(Collection $rows) {
         $canImport = true;
-        if (\App\Models\Addon::where('unique_identifier', 'seller_subscription')->first() != null && 
-                \App\Models\Addon::where('unique_identifier', 'seller_subscription')->first()->activated){
-            if(Auth::user()->user_type == 'seller' && count($rows) > Auth::user()->seller->remaining_uploads) {
+        if (addon_is_activated('seller_subscription')){
+            if(Auth::user()->user_type == 'seller' && Auth::user()->seller->seller_package && (count($rows) + Auth::user()->seller->user->products()->count()) > Auth::user()->seller->seller_package->product_upload_limit) {
                 $canImport = false;
                 flash(translate('Upload limit has been reached. Please upgrade your package.'))->warning();
             }
@@ -31,18 +30,23 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, To
         
         if($canImport) {
             foreach ($rows as $row) {
+				$approved = 1;
+				if(Auth::user()->user_type == 'seller' && get_setting('product_approve_by_admin') == 1) {
+					$approved = 0;
+				}
+				
                 $productId = Product::create([
                             'name' => $row['name'],
                             'added_by' => Auth::user()->user_type == 'seller' ? 'seller' : 'admin',
                             'user_id' => Auth::user()->user_type == 'seller' ? Auth::user()->id : User::where('user_type', 'admin')->first()->id,
-                            'category_id' => $row['category_id'],
+                            'approved' => $approved,
+							'category_id' => $row['category_id'],
                             'brand_id' => $row['brand_id'],
                             'video_provider' => $row['video_provider'],
                             'video_link' => $row['video_link'],
                             'unit_price' => $row['unit_price'],
                             'purchase_price' => $row['purchase_price'] == null ? $row['unit_price'] : $row['purchase_price'],
                             'unit' => $row['unit'],
-                            //           'current_stock' => $row['current_stock'],
                             'meta_title' => $row['meta_title'],
                             'meta_description' => $row['meta_description'],
                             'colors' => json_encode(array()),
