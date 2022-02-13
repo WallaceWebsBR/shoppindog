@@ -211,8 +211,8 @@
                         </ul>
 
                         <div class="text-left">
-                            <div class="d-flex align-items-center">
-                                <div>
+                            <div class="row gutters-5 flex-wrap align-items-center">
+                                <div class="col-lg col-10">
                                     <h1 class="h6 fw-600 text-body">
                                         @if(isset($category_id))
                                             {{ \App\Models\Category::find($category_id)->getTranslation('name') }}
@@ -224,7 +224,12 @@
                                     </h1>
                                     <input type="hidden" name="keyword" value="{{ $query }}">
                                 </div>
-                                <div class="form-group ml-auto mr-0 w-200px d-none d-xl-block">
+                                <div class="col-2 col-lg-auto d-xl-none mb-lg-3 text-right">
+                                    <button type="button" class="btn btn-icon p-0" data-toggle="class-toggle" data-target=".aiz-filter-sidebar">
+                                        <i class="la la-filter la-2x"></i>
+                                    </button>
+                                </div>
+                                <div class="col-6 col-lg-auto mb-3 w-lg-200px">
                                     @if (Route::currentRouteName() != 'products.brand')
                                         <label class="mb-0 opacity-50">{{ translate('Brands')}}</label>
                                         <select class="form-control form-control-sm aiz-selectpicker" data-live-search="true" name="brand" onchange="filter()">
@@ -235,7 +240,7 @@
                                         </select>
                                     @endif
                                 </div>
-                                <div class="form-group w-200px ml-0 ml-xl-3">
+                                <div class="col-6 col-lg-auto mb-3 w-lg-200px">
                                     <label class="mb-0 opacity-50">{{ translate('Sort by')}}</label>
                                     <select class="form-control form-control-sm aiz-selectpicker" name="sort_by" onchange="filter()">
                                         <option value="newest" @isset($sort_by) @if ($sort_by == 'newest') selected @endif @endisset>{{ translate('Newest')}}</option>
@@ -243,11 +248,6 @@
                                         <option value="price-asc" @isset($sort_by) @if ($sort_by == 'price-asc') selected @endif @endisset>{{ translate('Price low to high')}}</option>
                                         <option value="price-desc" @isset($sort_by) @if ($sort_by == 'price-desc') selected @endif @endisset>{{ translate('Price high to low')}}</option>
                                     </select>
-                                </div>
-                                <div class="d-xl-none ml-auto ml-xl-3 mr-0 form-group align-self-end">
-                                    <button type="button" class="btn btn-icon p-0" data-toggle="class-toggle" data-target=".aiz-filter-sidebar">
-                                        <i class="la la-filter la-2x"></i>
-                                    </button>
                                 </div>
                             </div>
                         </div>

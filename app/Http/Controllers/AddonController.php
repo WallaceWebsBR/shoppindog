@@ -91,6 +91,7 @@ class AddonController extends Controller
                         $addon->version = $json['version'];
                         $addon->activated = 1;
                         $addon->image = $json['addon_banner'];
+                        $addon->purchase_code = $request->purchase_code;
                         $addon->save();
 
                         // Create new directories.
@@ -148,15 +149,17 @@ class AddonController extends Controller
 
                         $addon = Addon::where('unique_identifier', $json['unique_identifier'])->first();
 
-                        for ($i = $addon->version + 0.1; $i <= $json['version']; $i = $i + 0.1) {
+                        for ($i = $addon->version + 0.05; $i <= $json['version']; $i = $i + 0.1) {
                             // Run sql modifications
-                            $sql_path = base_path('temp/' . $random_dir . '/addons/' . $dir . '/sql/' . $i . '.sql');
+                            $sql_version = $i+0.05;
+                            $sql_path = base_path('temp/' . $random_dir . '/addons/' . $dir . '/sql/' . $sql_version . '.sql');
                             if (file_exists($sql_path)) {
                                 DB::unprepared(file_get_contents($sql_path));
                             }
                         }
 
                         $addon->version = $json['version'];
+                        $addon->purchase_code = $request->purchase_code;
                         $addon->save();
 
                         flash(translate('This addon is updated successfully'))->success();

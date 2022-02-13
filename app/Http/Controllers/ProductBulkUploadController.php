@@ -21,7 +21,13 @@ class ProductBulkUploadController extends Controller
     public function index()
     {
         if (Auth::user()->user_type == 'seller') {
-            return view('frontend.user.seller.product_bulk_upload.index');
+            if(Auth::user()->seller->verification_status){
+                return view('frontend.user.seller.product_bulk_upload.index');
+            }
+            else{
+                flash('Your shop is not verified yet!')->warning();
+                return back();
+            }
         }
         elseif (Auth::user()->user_type == 'admin' || Auth::user()->user_type == 'staff') {
             return view('backend.product.bulk_upload.index');
@@ -65,16 +71,7 @@ class ProductBulkUploadController extends Controller
         if($request->hasFile('bulk_file')){
             $import = new ProductsImport;
             Excel::import($import, request()->file('bulk_file'));
-            
-            if(\App\Models\Addon::where('unique_identifier', 'seller_subscription')->first() != null && 
-                    \App\Models\Addon::where('unique_identifier', 'seller_subscription')->first()->activated){
-                $seller = Auth::user()->seller;
-                $seller->remaining_uploads -= $import->getRowCount();
-                $seller->save();
-            }
-//            dd('Row count: ' . $import->getRowCount());
         }
-        
         
         return back();
     }

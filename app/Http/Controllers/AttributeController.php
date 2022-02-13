@@ -8,6 +8,7 @@ use App\Models\Color;
 use App\Models\AttributeTranslation;
 use App\Models\AttributeValue;
 use CoreComponentRepository;
+use Str;
 
 class AttributeController extends Controller
 {
@@ -179,12 +180,12 @@ class AttributeController extends Controller
     }
     
     public function store_color(Request $request) {
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'required',
             'code' => 'required|unique:colors|max:255',
         ]);
         $color = new Color;
-        $color->name = $request->name;
+        $color->name = Str::replace(' ', '', $request->name);
         $color->code = $request->code;
         
         $color->save();
@@ -214,7 +215,7 @@ class AttributeController extends Controller
             'code' => 'required|unique:colors,code,'.$color->id,
         ]);
         
-        $color->name = $request->name;
+        $color->name = Str::replace(' ', '', $request->name);
         $color->code = $request->code;
         
         $color->save();

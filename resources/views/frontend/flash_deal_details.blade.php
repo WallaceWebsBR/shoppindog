@@ -23,7 +23,7 @@
                         @php
                             $product = \App\Models\Product::find($flash_deal_product->product_id);
                         @endphp
-                        @if ($product->published != 0)
+                        @if (isset($product) && $product->published != 0)
                             <div class="col mb-2">
                                 @include('frontend.partials.product_box_1',['product' => $product])
                             </div>

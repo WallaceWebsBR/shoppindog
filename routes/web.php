@@ -21,12 +21,6 @@ Route::get('/insert_product_variant_forcefully', 'DemoController@insert_product_
 Route::get('/update_seller_id_in_orders/{id_min}/{id_max}', 'DemoController@update_seller_id_in_orders');
 Route::get('/migrate_attribute_values', 'DemoController@migrate_attribute_values');
 
-
-Route::get('/proxy-pay', 'ProxypayController@create_reference');
-Route::get('/mock_payments', 'ProxypayController@webhook_response');
-Route::post('/test-me', 'ProxypayController@mock_payment');
-
-
 Route::get('/refresh-csrf', function() {
     return csrf_token();
 });
@@ -148,11 +142,11 @@ Route::get('/sellers', 'HomeController@all_seller')->name('sellers');
 Route::get('/coupons', 'HomeController@all_coupons')->name('coupons.all');
 Route::get('/inhouse', 'HomeController@inhouse_products')->name('inhouse.all');
 
-Route::get('/sellerpolicy', 'HomeController@sellerpolicy')->name('sellerpolicy');
-Route::get('/returnpolicy', 'HomeController@returnpolicy')->name('returnpolicy');
-Route::get('/supportpolicy', 'HomeController@supportpolicy')->name('supportpolicy');
+Route::get('/seller-policy', 'HomeController@sellerpolicy')->name('sellerpolicy');
+Route::get('/return-policy', 'HomeController@returnpolicy')->name('returnpolicy');
+Route::get('/support-policy', 'HomeController@supportpolicy')->name('supportpolicy');
 Route::get('/terms', 'HomeController@terms')->name('terms');
-Route::get('/privacypolicy', 'HomeController@privacypolicy')->name('privacypolicy');
+Route::get('/privacy-policy', 'HomeController@privacypolicy')->name('privacypolicy');
 
 Route::group(['middleware' => ['user', 'verified', 'unbanned']], function() {
     Route::get('/dashboard', 'HomeController@dashboard')->name('dashboard');
@@ -238,6 +232,9 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('/orders/details', 'OrderController@order_details')->name('orders.details');
     Route::post('/orders/update_delivery_status', 'OrderController@update_delivery_status')->name('orders.update_delivery_status');
     Route::post('/orders/update_payment_status', 'OrderController@update_payment_status')->name('orders.update_payment_status');
+    Route::post('/orders/update_tracking_code', 'OrderController@update_tracking_code')->name('orders.update_tracking_code');
+
+    //Delivery Boy Assign
     Route::post('/orders/delivery-boy-assign', 'OrderController@assign_delivery_boy')->name('orders.delivery-boy-assign');
 
     Route::resource('/reviews', 'ReviewController');
@@ -347,6 +344,8 @@ Route::post('/aamarpay/fail','AamarpayController@fail')->name('aamarpay.fail');
 //Authorize-Net-Payment
 Route::post('/dopay/online', 'AuthorizeNetController@handleonlinepay')->name('dopay.online');
 
+//payku
+Route::get('/payku/callback/{id}', 'PaykuController@callback')->name('payku.result');
 
 //Blog Section
 Route::get('/blog', 'BlogController@all_blog')->name('blog');

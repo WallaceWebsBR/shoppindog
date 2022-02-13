@@ -11,8 +11,8 @@
             <div class="col text-center text-md-left">
             </div>
             @php
-            $delivery_status = $order->delivery_status;
-            $payment_status = $order->payment_status;
+                $delivery_status = $order->delivery_status;
+                $payment_status = $order->payment_status;
             @endphp
 
             <!--Assign Delivery Boy-->
@@ -35,14 +35,14 @@
             @endif
 
             <div class="col-md-3 ml-auto">
-                <label for=update_payment_status"">{{translate('Payment Status')}}</label>
+                <label for="update_payment_status">{{translate('Payment Status')}}</label>
                 <select class="form-control aiz-selectpicker"  data-minimum-results-for-search="Infinity" id="update_payment_status">
                     <option value="unpaid" @if ($payment_status == 'unpaid') selected @endif>{{translate('Unpaid')}}</option>
                     <option value="paid" @if ($payment_status == 'paid') selected @endif>{{translate('Paid')}}</option>
                 </select>
             </div>
             <div class="col-md-3 ml-auto">
-                <label for=update_delivery_status"">{{translate('Delivery Status')}}</label>
+                <label for="update_delivery_status">{{translate('Delivery Status')}}</label>
                 @if($delivery_status != 'delivered' && $delivery_status != 'cancelled')
                     <select class="form-control aiz-selectpicker"  data-minimum-results-for-search="Infinity" id="update_delivery_status">
                         <option value="pending" @if ($delivery_status == 'pending') selected @endif>{{translate('Pending')}}</option>
@@ -56,6 +56,16 @@
                     <input type="text" class="form-control" value="{{ $delivery_status }}" disabled>
                 @endif
             </div>
+            <div class="col-md-3 ml-auto">
+                <label for="update_tracking_code">{{translate('Tracking Code (optional)')}}</label>
+                <input type="text" class="form-control" id="update_tracking_code" value="{{ $order->tracking_code }}">
+            </div>
+        </div>
+        <div class="mb-3">
+            @php
+                                $removedXML = '<?xml version="1.0" encoding="UTF-8"?>';
+                            @endphp
+                            {!! str_replace($removedXML,"", QrCode::size(100)->generate($order->code)) !!}
         </div>
         <div class="row gutters-5">
             <div class="col text-center text-md-left">
@@ -105,7 +115,7 @@
                         </tr>
                         <tr>
                             <td class="text-main text-bold">{{translate('Payment method')}}</td>
-                            <td class="text-right">{{ ucfirst(str_replace('_', ' ', $order->payment_type)) }}</td>
+                            <td class="text-right">{{ translate(ucfirst(str_replace('_', ' ', $order->payment_type))) }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -150,12 +160,12 @@
                                 @endif
                             </td>
                             <td>
-                                @if ($orderDetail->shipping_type != null && $orderDetail->shipping_type == 'home_delivery')
+                                @if ($order->shipping_type != null && $order->shipping_type == 'home_delivery')
                                 {{ translate('Home Delivery') }}
-                                @elseif ($orderDetail->shipping_type == 'pickup_point')
+                                @elseif ($order->shipping_type == 'pickup_point')
 
-                                @if ($orderDetail->pickup_point != null)
-                                {{ $orderDetail->pickup_point->getTranslation('name') }} ({{ translate('Pickup Point') }})
+                                @if ($order->pickup_point != null)
+                                {{ $order->pickup_point->getTranslation('name') }} ({{ translate('Pickup Point') }})
                                 @else
                                 {{ translate('Pickup Point') }}
                                 @endif
@@ -255,6 +265,14 @@
             var status = $('#update_payment_status').val();
             $.post('{{ route('orders.update_payment_status') }}', {_token:'{{ @csrf_token() }}',order_id:order_id,status:status}, function(data){
                 AIZ.plugins.notify('success', '{{ translate('Payment status has been updated') }}');
+            });
+        });
+
+        $('#update_tracking_code').on('change', function(){
+            var order_id = {{ $order->id }};
+            var tracking_code = $('#update_tracking_code').val();
+            $.post('{{ route('orders.update_tracking_code') }}', {_token:'{{ @csrf_token() }}',order_id:order_id,tracking_code:tracking_code}, function(data){
+                AIZ.plugins.notify('success', '{{ translate('Order tracking code has been updated') }}');
             });
         });
     </script>

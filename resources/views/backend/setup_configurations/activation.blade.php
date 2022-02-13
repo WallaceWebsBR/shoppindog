@@ -178,6 +178,36 @@
             </div>
         </div>
     </div>
+    @if(addon_is_activated('wholesale'))
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0 h6 text-center">{{translate('Wholesale Product for Seller')}}</h3>
+                </div>
+                <div class="card-body text-center">
+                    <label class="aiz-switch aiz-switch-success mb-0">
+                        <input type="checkbox" onchange="updateSettings(this, 'seller_wholesale_product')" <?php if(get_setting('seller_wholesale_product') == 1) echo "checked";?>>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    @endif
+    @if(addon_is_activated('auction'))
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0 h6 text-center">{{translate('Auction Product for Seller')}}</h3>
+                </div>
+                <div class="card-body text-center">
+                    <label class="aiz-switch aiz-switch-success mb-0">
+                        <input type="checkbox" onchange="updateSettings(this, 'seller_auction_product')" <?php if(get_setting('seller_auction_product') == 1) echo "checked";?>>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
 
 <h4 class="text-center text-muted mt-4">{{translate('Payment Related')}}</h4>
@@ -475,6 +505,26 @@
                 </div>
                 <div class="alert" style="color: #004085;background-color: #cce5ff;border-color: #b8daff;margin-bottom:0;margin-top:10px;">
                     {{ translate('You need to configure authorize net correctly to enable this feature') }}. <a href="{{ route('payment_method.index') }}">{{ translate('Configure Now') }}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0 h6 text-center">{{translate('Payku Activation')}}</h3>
+            </div>
+            <div class="card-body text-center">
+                <div class="clearfix">
+                    <img class="float-left" src="{{ static_asset('assets/img/cards/payku.png') }}" height="30">
+                    <label class="aiz-switch aiz-switch-success mb-0 float-right">
+                        <input type="checkbox" onchange="updateSettings(this, 'payku')" <?php if(get_setting('payku') == 1) echo "checked";?>>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="alert" style="color: #004085;background-color: #cce5ff;border-color: #b8daff;margin-bottom:0;margin-top:10px;">
+                    {{ translate('You need to configure payku net correctly to enable this feature') }}. <a href="{{ route('payment_method.index') }}">{{ translate('Configure Now') }}</a>
                 </div>
             </div>
         </div>

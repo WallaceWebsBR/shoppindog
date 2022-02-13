@@ -4,7 +4,7 @@ namespace App\Utility;
 
 use App\Mail\InvoiceEmailManager;
 use App\Models\User;
-use App\SmsTemplate;
+use App\Models\SmsTemplate;
 use App\Http\Controllers\OTPVerificationController;
 use Mail;
 use Illuminate\Support\Facades\Notification;
@@ -14,7 +14,19 @@ use App\Models\FirebaseNotification;
 class NotificationUtility
 {
     public static function sendOrderPlacedNotification($order, $request = null)
-    {        
+    {       
+        //sends email to customer with the invoice pdf attached
+        $array['view'] = 'emails.invoice';
+        $array['subject'] = translate('A new order has been placed') . ' - ' . $order->code;
+        $array['from'] = env('MAIL_FROM_ADDRESS');
+        $array['order'] = $order;
+        try {
+            Mail::to($order->user->email)->queue(new InvoiceEmailManager($array));
+            Mail::to($order->orderDetails->first()->product->user->email)->queue(new InvoiceEmailManager($array));
+        } catch (\Exception $e) {
+
+        }
+
         if (addon_is_activated('otp_system') && SmsTemplate::where('identifier', 'order_placement')->first()->status == 1) {
             try {
                 $otpController = new OTPVerificationController;
@@ -36,20 +48,6 @@ class NotificationUtility
             $request->user_id = $order->user->id;
 
             self::sendFirebaseNotification($request);
-        }
-
-        //sends email to customer with the invoice pdf attached
-        if (env('MAIL_USERNAME') != null) {
-            $array['view'] = 'emails.invoice';
-            $array['subject'] = translate('Your order has been placed') . ' - ' . $order->code;
-            $array['from'] = env('MAIL_FROM_ADDRESS');
-            $array['order'] = $order;
-            try {
-                Mail::to($order->user->email)->queue(new InvoiceEmailManager($array));
-                Mail::to(User::where('user_type', 'admin')->first()->email)->queue(new InvoiceEmailManager($array));
-            } catch (\Exception $e) {
-
-            }
         }
     }
 

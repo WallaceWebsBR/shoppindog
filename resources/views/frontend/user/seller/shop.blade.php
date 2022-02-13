@@ -85,7 +85,7 @@
     </div>
 
     @if (addon_is_activated('delivery_boy'))
-        {{-- <div class="card">
+        <div class="card">
             <div class="card-header">
                 <h5 class="mb-0 h6">{{ translate('Delivery Boy Pickup Point') }}</h5>
             </div>
@@ -146,7 +146,7 @@
                     </div>
                 </form>
             </div>
-        </div> --}}
+        </div>
     @endif
 
     {{-- Banner Settings --}}
@@ -227,5 +227,15 @@
             </form>
         </div>
     </div>
+
+@endsection
+
+@section('script')
+
+    @if (get_setting('google_map') == 1)
+        
+        @include('frontend.partials.google_map')
+        
+    @endif
 
 @endsection

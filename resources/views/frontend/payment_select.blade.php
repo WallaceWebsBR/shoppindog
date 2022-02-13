@@ -228,19 +228,6 @@
                                                 </label>
                                             </div>
                                         @endif
-                                        @if(get_setting('proxypay') == 1)
-                                            <div class="col-6 col-md-4">
-                                                <label class="aiz-megabox d-block mb-3">
-                                                    <input value="proxypay" class="online_payment" type="radio" name="payment_option" checked>
-                                                    <span class="d-block p-3 aiz-megabox-elem">
-                                                        <img src="{{ static_asset('assets/img/cards/proxypay.png')}}" class="img-fluid mb-2">
-                                                        <span class="d-block text-center">
-                                                            <span class="d-block fw-600 fs-15">{{ translate('ProxyPay')}}</span>
-                                                        </span>
-                                                    </span>
-                                                </label>
-                                            </div>
-                                        @endif
                                         @if(get_setting('authorizenet') == 1)
                                             <div class="col-6 col-md-4">
                                                 <label class="aiz-megabox d-block mb-3">
@@ -249,6 +236,19 @@
                                                         <img src="{{ static_asset('assets/img/cards/authorizenet.png')}}" class="img-fluid mb-2">
                                                         <span class="d-block text-center">
                                                             <span class="d-block fw-600 fs-15">{{ translate('Authorize Net')}}</span>
+                                                        </span>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        @endif
+                                        @if(get_setting('payku') == 1)
+                                            <div class="col-6 col-md-4">
+                                                <label class="aiz-megabox d-block mb-3">
+                                                    <input value="payku" class="online_payment" type="radio" name="payment_option" checked>
+                                                    <span class="d-block p-3 aiz-megabox-elem">
+                                                        <img src="{{ static_asset('assets/img/cards/payku.png')}}" class="img-fluid mb-2">
+                                                        <span class="d-block text-center">
+                                                            <span class="d-block fw-600 fs-15">{{ translate('Payku')}}</span>
                                                         </span>
                                                     </span>
                                                 </label>
@@ -338,7 +338,7 @@
                                         @endif
                                         @if (Auth::check())
                                             @if (addon_is_activated('offline_payment'))
-                                                @foreach(\App\ManualPaymentMethod::all() as $method)
+                                                @foreach(\App\Models\ManualPaymentMethod::all() as $method)
                                                     <div class="col-6 col-md-4">
                                                         <label class="aiz-megabox d-block mb-3">
                                                             <input value="{{ $method->heading }}" type="radio" name="payment_option" onchange="toggleManualPaymentData({{ $method->id }})" data-id="{{ $method->id }}" checked>
@@ -352,7 +352,7 @@
                                                     </div>
                                                 @endforeach
 
-                                                @foreach(\App\ManualPaymentMethod::all() as $method)
+                                                @foreach(\App\Models\ManualPaymentMethod::all() as $method)
                                                     <div id="manual_payment_info_{{ $method->id }}" class="d-none">
                                                         @php echo $method->description @endphp
                                                         @if ($method->bank_info != null)

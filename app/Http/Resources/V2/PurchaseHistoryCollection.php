@@ -11,12 +11,18 @@ class PurchaseHistoryCollection extends ResourceCollection
     {
         return [
             'data' => $this->collection->map(function ($data) {
+                $pickup_point = null;
+                if ($data->shipping_type == 'pickup_point' && $data->pickup_point_id) {
+                    $pickup_point = $data->pickup_point;
+                }
+
                 return [
                     'id' => $data->id,
                     'code' => $data->code,
                     'user_id' => (int) $data->user_id,
                     'shipping_address' => json_decode($data->shipping_address),
                     'payment_type' => ucwords(str_replace('_', ' ', $data->payment_type)),
+                    'pickup_point' => $pickup_point,
                     'shipping_type' => $data->shipping_type,
                     'shipping_type_string' => $data->shipping_type != null ? ucwords(str_replace('_', ' ', $data->shipping_type)) : "",
                     'payment_status' => $data->payment_status,

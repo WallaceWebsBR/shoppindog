@@ -50,9 +50,6 @@ class WalletController extends Controller
         } elseif ($request->payment_option == 'paystack') {
             $paystack = new PaystackController;
             return $paystack->redirectToGateway($request);
-        } elseif ($request->payment_option == 'proxypay') {
-            $proxy = new ProxypayController;
-            return $proxy->create_reference($request);
         } elseif ($request->payment_option == 'voguepay') {
             $voguepay = new VoguePayController;
             return $voguepay->customer_showForm();
@@ -96,6 +93,11 @@ class WalletController extends Controller
         } elseif ($request->payment_option == 'paytm') {
             $paytm = new PaytmController;
             return $paytm->index();
+        } else if ($request->payment_option == 'authorizenet') {
+            $authorize_net = new AuthorizeNetController();
+            return $authorize_net->pay();
+        } elseif ($request->payment_option == 'payku') {
+            return (new PaykuController)->create($request);
         }
     }
 

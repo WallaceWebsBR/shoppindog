@@ -274,6 +274,15 @@
                             <small class="text-muted">{{translate('Leave it blank if you do not use external site link')}}</small>
                         </div>
                     </div>
+                    <div class="form-group row">
+                        <label class="col-md-3 col-from-label">
+                            {{translate('External link button text')}}
+                        </label>
+                        <div class="col-md-9">
+                            <input type="text" placeholder="{{ translate('External link button text') }}" name="external_link_btn" class="form-control">
+                            <small class="text-muted">{{translate('Leave it blank if you do not use external site link')}}</small>
+                        </div>
+                    </div>
                     <br>
                     <div class="sku_combination" id="sku_combination">
 

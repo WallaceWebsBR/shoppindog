@@ -1,6 +1,6 @@
 <div class="aiz-card-box border border-light rounded hov-shadow-md mt-1 mb-2 has-transition bg-white">
     @if(discount_in_percentage($product) > 0)
-        <span class="badge-custom">{{ translate('OFF') }}<span class="box ml-1">&nbsp;{{discount_in_percentage($product)}}%</span></span>
+        <span class="badge-custom">{{ translate('OFF') }}<span class="box ml-1 mr-0">&nbsp;{{discount_in_percentage($product)}}%</span></span>
     @endif
     <div class="position-relative">
         <a href="{{ route('product', $product->slug) }}" class="d-block">

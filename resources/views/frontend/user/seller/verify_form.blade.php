@@ -38,7 +38,7 @@
                             <div class="col-md-10">
                                 <div class="custom-file">
                                     <label class="custom-file-label">
-                                        <input type="{{ $element->type }}" name="element_{{ $key }}" id="file-{{ $key }}" class="custom-file-input">
+                                        <input type="{{ $element->type }}" name="element_{{ $key }}" id="file-{{ $key }}" class="custom-file-input" required>
                                         <span class="custom-file-name">Choose file</span>
                                     </label>
                                 </div>
